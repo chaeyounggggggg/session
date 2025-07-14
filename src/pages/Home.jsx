@@ -1,12 +1,30 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import {useState,useEffect} from "react";
 import * as H from "../styles/styledHome";
+import axios from "axios";
 
 const Home = () => {
   const navigate = useNavigate();
   const goSend = () => {
     navigate(`/send`);
   };
+
+  const [postList,setPostList] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // API 호출
+        const response = await axios.get("/posts");
+        setPostList(response.data); // API 응답으로 받은 데이터를 state에 저장
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData(); // useEffect에서 fetchData 함수 호출
+  }, []);
+
 
   return (
     <H.Container>
@@ -24,9 +42,11 @@ const Home = () => {
           LETTER
         </H.Title>
         <H.LetterWrapper>
-          <H.Letter key={1} onClick={() => navigate(`/detail`)}>
-            제목임시
-          </H.Letter>
+          {postList.map((e) => (
+            <H.Letter key={e.id} onClick={() => navigate(`/detail/${e.id}`)}>
+              {e.title}
+            </H.Letter>
+          ))}
         </H.LetterWrapper>
 
         <H.PostBox>
